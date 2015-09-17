@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>League of API</title>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+	$( document).ready(function()
+	{
+		var button = document.getElementById("run");
+		console.dir(button);
+		$("#run").click(function()
+		{
+			$.getJSON("https://na.api.pvp.net/api/lol/na/v1.3/game/by-summoner/44199889/recent?api_key=e76cf560-ec14-4aae-946c-35967340214d",
+			function(data)
+			{
+				console.dir(data);
+				console.log(data["games"][0]["gameMode"]);
+				//data["games"][]
+				alert("Load was performed.");
+			});
+		});
+	});
+</script>
+</head>
+
+<body>
+
+<button id="run">Run API</button>
+
+
+</body>
+
+</html>
+
+<!--javascript
+jquery
+jquery.get(url)
+-->
