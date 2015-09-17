@@ -8,3 +8,13 @@ line 16: puts data in console to find console, go to chrome -> developer tools -
 
 good references!
 api.jquery.com - on left click on ajax and scroll down to get jquery get calls
+https://developer.riotgames.com/api/methods - references to urls to get data from! make sure to get summoner id's before getting other data!
+
+didn't work out
+https://www.youtube.com/watch?v=YhRQfriCPBk&list=PLRjQnSfE7eXExG0khQ-dyWRsMsWu-VHgo&index=1 - was too slow to follow and didn't have good references or explain very well
+https://www.youtube.com/watch?v=0NycEiHOeX8 - used python don't know it
+
+other things to learn about!
+javascript
+jquery
+jquery.getjason(url)
