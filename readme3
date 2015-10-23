@@ -1,0 +1,15 @@
+Following up on the previous example
+Tried to push through the problem of not being able to alert any meaningfull data (everything was 0) or printing at all (when moving the alert in and out of the for loop and function call)
+
+Eventually found a solution with creating a completed request variable and increminting it, and once it hit 7 exicute the alert.
+Was previously relying on the i in the loop to get to 7 but it was always that number whenever the call was being made.
+
+Fixed the problem last time of "while totalWinEnemyMonsterKills and numOfWins incremented correctly they won't show when displayed outside of the loop.
+  the variables are lines 79 and 80 and displaying them was in lines 91-95 (i tried several ways to get the numbers to show)"
+
+tries looking at geting json callback passing by value. by looking at this post http://stackoverflow.com/questions/518000/is-javascript-a-pass-by-reference-or-pass-by-value-language, i learned that javascript functions pass variables by value, even the the items passed is a reference.
+this is called call-by-sharing
+this is what was giving me all of my problemsn and why i couldn't get any meaningful data from the last exploration!
+
+good references
+http://stackoverflow.com/questions/518000/is-javascript-a-pass-by-reference-or-pass-by-value-language
