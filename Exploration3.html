@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>League of API</title>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+	$( document).ready(function()
+	{
+		var button = document.getElementById("run");
+		console.dir(button);
+		$("#run").click(function()
+		{
+			var summonerName = document.getElementById("summonerName");
+			console.log(summonerName.value);
+
+			// get summoner info by summoner name
+			$.getJSON("https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + summonerName.value + "?api_key=e76cf560-ec14-4aae-946c-35967340214d",
+			function(data)
+			{
+				console.dir(data);
+				summonerName.value.toLowerCase().replace(" ", "");
+				console.log(summonerName.value.toLowerCase().replace(" ", ""));
+				console.log(data[summonerName.value.toLowerCase().replace(" ", "")]["id"]);
+				var summonerId = data[summonerName.value.toLowerCase().replace(" ", "")]["id"];
+
+				// get entire matchlist by summoner id
+				$.getJSON("https://na.api.pvp.net/api/lol/na/v2.2/matchlist/by-summoner/" + summonerId + "?api_key=e76cf560-ec14-4aae-946c-35967340214d",
+				function(data)
+				{
+					console.dir(data);
+					var matchIdArr = [];
+					var matchWinEnemyNeutralMonsterKills = [];
+					var matchLossEnemyNeutralMonsterKills = [];
+					var totalWinEnemyMonsterKills = 0;
+					var numOfWins = 0;
+					var numOfLosses = 0;
+					var matchArrNum = 0;
+					var participantId;
+
+					console.dir(matchWinEnemyNeutralMonsterKills);
+					// Push all ranked jungle match id's into an array
+					for (i = 0; i < data["endIndex"]; i++)
+					{
+						if (data["matches"][i]["queue"] == "RANKED_SOLO_5x5" && data["matches"][i]["lane"] == "JUNGLE")
+						{
+							matchIdArr.push(data["matches"][i]["matchId"]);
+							matchArrNum++;
+						}
+					}
+					console.dir(matchIdArr);
+
+					// For each match id in array, process data
+//					for (i = 0; i < matchIdArr["endIndex"]; i++)
+					var completed_req = 0;
+					for (i = 0; i < 7; i++)
+					{
+						// get match data by id
+						$.getJSON("https://na.api.pvp.net/api/lol/na/v2.2/match/" + matchIdArr[i] + "?includeTimeline=false&api_key=e76cf560-ec14-4aae-946c-35967340214d",
+						function(data)
+						{
+							completed_req += 1;
+							console.dir(completed_req);
+							console.dir(data);
+							var n = i;
+							console.dir(n);
+							console.dir(i);
+
+							for (j = 0; j < 10; j++)
+							{
+								if (data["participantIdentities"][j]["player"]["summonerName"] == summonerName.value)
+								{
+									participantId = j;
+//									break;
+								}
+							}
+
+//							console.dir(participantId);
+//							console.dir(data["participantIdentities"][participantId]["player"]["summonerName"]);
+
+							if (data["participants"][participantId]["stats"]["winner"] == true)
+							{
+								console.dir("neutralMinionsKilledEnemyJungle push = " + data["participants"][participantId]["stats"]["neutralMinionsKilledEnemyJungle"]);
+								
+								matchWinEnemyNeutralMonsterKills.push(data["participants"][participantId]["stats"]["neutralMinionsKilledEnemyJungle"]);
+								console.dir(matchWinEnemyNeutralMonsterKills);
+								totalWinEnemyMonsterKills += data["participants"][participantId]["stats"]["neutralMinionsKilledEnemyJungle"];
+								numOfWins++;
+								console.dir(totalWinEnemyMonsterKills);
+//							alert("Total Number of Enemy Neutral Monsters Killed with wins = " + totalWinEnemyMonsterKills);
+							}
+							else
+							{
+								matchLossEnemyNeutralMonsterKills.push(data["participants"][participantId]["stats"]["neutralMinionsKilledEnemyJungle"]);
+								numOfLosses++;
+							}
+
+							if (completed_req == 7)
+							{
+								console.dir(matchWinEnemyNeutralMonsterKills);
+								console.dir(matchWinEnemyNeutralMonsterKills.length);
+//								console.dir(matchWinEnemyNeutralMonsterKills[0].length);
+								console.dir(totalWinEnemyMonsterKills);
+								console.dir(Number(numOfWins));
+								alert("Total Number of Enemy Neutral Monsters Killed with wins = " + totalWinEnemyMonsterKills);
+							}
+						});
+
+/*						if (completed_req == 7)
+						{
+							console.dir(matchWinEnemyNeutralMonsterKills);
+							console.dir(matchWinEnemyNeutralMonsterKills.length);
+//							console.dir(matchWinEnemyNeutralMonsterKills[0].length);
+							console.dir(totalWinEnemyMonsterKills);
+							console.dir(Number(numOfWins));
+							alert("Total Number of Enemy Neutral Monsters Killed with wins = " + totalWinEnemyMonsterKills);
+						}*/
+					}
+				});
+
+
+				// get recent games by summoner id (last 10)
+/*				$.getJSON("https://na.api.pvp.net/api/lol/na/v1.3/game/by-summoner/" + summonerId + "/recent?api_key=e76cf560-ec14-4aae-946c-35967340214d",
+				function(data)
+				{
+					console.dir(data);
+					console.log(data["games"][0]["gameMode"]);
+					alert("Load was performed.");
+				});
+*/
+			});
+		});
+	});
+</script>
+</head>
+
+<body>
+
+<input type="text" name="summonerName" id="summonerName" value="Zann Starfire">
+<button id="run">Run Summoner</button>
+
+
+</body>
+
+</html>
