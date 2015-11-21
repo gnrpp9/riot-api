@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>League of API</title>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+	$( document).ready(function()
+	{
+		$("#run").click(function()
+		{
+			var summonerName = document.getElementById("summonerName");
+			console.log(summonerName.value);
+
+			// get summoner info by summoner name
+			$.getJSON("https://na.api.pvp.net/api/lol/na/v1.4/summoner/by-name/" + summonerName.value + "?api_key=e76cf560-ec14-4aae-946c-35967340214d",
+			function(data)
+			{
+//				console.log(data);
+				summonerName.value.toLowerCase().replace(" ", "");
+				console.log(summonerName.value.toLowerCase().replace(" ", ""));
+				var summonerId = data[summonerName.value.toLowerCase().replace(" ", "")]["id"];
+				console.log(summonerId);
+
+				// get ranked stats by summoner name
+				$.getJSON("https://na.api.pvp.net/api/lol/na/v1.3/stats/by-summoner/" + summonerId + "/ranked?season=SEASON2015&api_key=e76cf560-ec14-4aae-946c-35967340214d",
+				function(data)
+				{
+					console.dir(data);
+					var rankedData = data;
+//					console.dir(rankedData);
+					var listOfChampionIds = [];
+					var listOfChampionNumOfGames = [];
+//					console.dir(data["champions"].length);
+					for (i = 0; i < data["champions"].length; i++)
+					{
+						listOfChampionIds.push(data["champions"][i]["id"]);
+						listOfChampionNumOfGames.push(data["champions"][i]["stats"]["totalSessionsPlayed"]);
+					}
+
+//					console.dir(listOfChampionIds);
+//					console.dir(listOfChampionNumOfGames);
+
+					// sort champions by number of games (bubble sort cuz i'm lazy)
+					do
+					{
+						var swapped = false;
+						for (i = 0; i < listOfChampionIds.length; i++)
+						{
+							if (listOfChampionNumOfGames[i] < listOfChampionNumOfGames[i+1])
+							{
+								var temp = listOfChampionNumOfGames[i];
+								listOfChampionNumOfGames[i] = listOfChampionNumOfGames[i+1];
+								listOfChampionNumOfGames[i+1] = temp;
+								temp = listOfChampionIds[i];
+								listOfChampionIds[i] = listOfChampionIds[i+1];
+								listOfChampionIds[i+1] = temp;
+								swapped = true;
+							}
+						}
+					}
+					while (swapped == true)
+
+					console.dir(listOfChampionIds);
+					console.dir(listOfChampionNumOfGames);
+
+					// get champions by id's
+					$.getJSON("https://global.api.pvp.net/api/lol/static-data/na/v1.2/champion?dataById=true&api_key=e76cf560-ec14-4aae-946c-35967340214d",
+					function(data)
+					{
+//						console.dir(data);
+//						console.dir(rankedData);
+//						console.dir(listOfChampionIds);
+
+						var temp = "<table style=width:100%>" +
+										"<tr>" +
+											"<td>Champion Name</td>" +
+											"<td>Number of Games</td>" +
+											"<td>Average Kills</td>" +
+											"<td>Average Deaths</td>" +
+											"<td>Average Assists</td>" +
+										"</tr>";
+						for (i = 0; i < listOfChampionIds.length; i++)
+						{
+							if (listOfChampionIds[i] != 0)
+							{
+//								console.dir(data["data"][listOfChampionIds[i]]["name"]);
+								for (j = 0; j < rankedData["champions"].length; j++)
+								{
+									if (rankedData["champions"][j]["id"] == listOfChampionIds[i])
+										break;
+								}
+
+								temp = temp + "<tr>" +
+												"<td>" + data["data"][listOfChampionIds[i]]["name"] + "</td>" +
+												"<td>" + listOfChampionNumOfGames[i] + "</td>" +
+												"<td>" + rankedData["champions"][j]["stats"]["totalChampionKills"]/rankedData["champions"][j]["stats"]["totalSessionsPlayed"] + "</td>" +
+												"<td>" + rankedData["champions"][j]["stats"]["totalDeathsPerSession"]/rankedData["champions"][j]["stats"]["totalSessionsPlayed"] + "</td>" +
+												"<td>" + rankedData["champions"][j]["stats"]["totalAssists"]/rankedData["champions"][j]["stats"]["totalSessionsPlayed"] + "</td>" +
+											"</tr>";
+							}
+						}
+						document.getElementById("championList").innerHTML = "<h3>List of champions to compare!</h3>" + temp + "</table>";
+					});
+				});
+			});
+		});
+	});
+</script>
+</head>
+
+<body>
+
+<input type="text" name="summonerName" id="summonerName" value="Zann Starfire">
+<button id="run">Run Summoner</button><br>
+<h3>Choose two champions from this summoner's ranked history to compare!</h3>
+<div id = "championList"></div>
+
+</body>
+</html>
